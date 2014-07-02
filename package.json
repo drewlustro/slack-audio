@@ -38,5 +38,11 @@
   "dependencies": {
     "minimist": "~0.0.8",
     "verbalize": "~0.1.1"
+  },
+  "devDependencies": {
+    "colors": "^0.6.2",
+    "nowplaying": "^1.0.5",
+    "request": "^2.36.0",
+    "verbalize": "^0.1.2"
   }
 }
