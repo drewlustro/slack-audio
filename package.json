@@ -1,0 +1,42 @@
+{
+  "name": "nowplaying-slack",
+  "description": "Uses nowplaying to hook into slack channel",
+  "version": "0.1.0",
+  "homepage": "https://github.com/drewlustro/nowplaying-slack",
+  "author": {
+    "name": "Drew Lustro",
+    "url": "https://github.com/drewlustro"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/drewlustro/nowplaying-slack.git"
+  },
+  "bugs": {
+    "url": "https://github.com/drewlustro/nowplaying-slack/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/drewlustro/nowplaying-slack/blob/master/LICENSE-MIT"
+    }
+  ],
+  "keywords": [
+    "cli",
+    "command line"
+  ],
+  "preferGlobal": true,
+  "bin": {
+    "nowplaying-slack": "./bin/nowplaying-slack"
+  },
+  "main": "index.js",
+  "engines": {
+    "node": ">=0.8"
+  },
+  "scripts": {
+    "test": "mocha -R test"
+  },
+  "dependencies": {
+    "minimist": "~0.0.8",
+    "verbalize": "~0.1.1"
+  }
+}
