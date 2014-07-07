@@ -34,7 +34,8 @@
     "test": "mocha -R test"
   },
   "dependencies": {
-    "minimist": "~0.0.8",
+    "mkdirp": "^0.5.0",
+    "nconf": "^0.6.9",
     "verbalize": "~0.1.1"
   },
   "devDependencies": {

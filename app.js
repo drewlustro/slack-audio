@@ -1,50 +1,98 @@
 #!/usr/bin/env node
 
-var fs = require('fs');
-var path = require('path');
-var log = require('verbalize');
-var colors = require('colors');
-var nowplaying = require('nowplaying');
-var request = require('request');
+var fs = require('fs'),
+    path = require('path'),
+    log = require('verbalize'),
+    colors = require('colors'),
+    nconf = require('nconf'),
+    mkdirp = require('mkdirp'),
+    nowplaying = require('nowplaying'),
+    request = require('request');
 
 var itunes = require('./lib/itunes');
 var spotify = require('./lib/spotify');
-
 var apps = [itunes, spotify];
 
-var argv = require('minimist')(process.argv.slice(2), {
-    'string': ['user', 'channel', 'url'],
-    'default': {
-        'user': 'Unknown Maxrelaxer',
-        'channel': '#relaxbot',
-        'bot': 'Jams Bot',
-        'url': 'https://maxrelax.slack.com/services/hooks/incoming-webhook?token=THTv0gnuZCooGY16FS2SBxc0'
-    }
+nconf.env(['HOME', 'NODE_ENV']);
+
+var defaultConfigFilePath = path.normalize(path.join(nconf.get('HOME'), '.config', 'slack-audio', 'config.json'));
+nconf.use('file', {
+    file: defaultConfigFilePath
 });
 
+console.log(('Using slack-audio configuration: ' + defaultConfigFilePath).yellow);
+mkdirp.sync(path.dirname(defaultConfigFilePath));
 
-var user = argv.user,
-    bot = argv.bot,
-    channel = argv.channel,
-    webhookUrl = argv.url;
 
-var slack = {
-    'username': bot,
-    'icon_emoji': ':musical_note:',
-    'channel': channel,
-    'webhookUrl': webhookUrl
-};
+nconf.argv({
+    'user': {
+        alias: 'u',
+        describe: 'User to report as poster in Slack channel.',
+        default: (nconf.get('slack:user') || 'Unknown Maxrelaxer')
+    },
+    'channel': {
+        alias: 'c',
+        describe: 'Slack channel to post song playing changes to.',
+        default: (nconf.get('slack:channel') || '#relaxbot')
+    },
+    'bot': {
+        alias: 'b',
+        describe: 'Name of the bot that posts to Slack channel.',
+        default: (nconf.get('slack:bot') || 'Jams Bot')
+    },
+    'url': {
+        alias: 'w',
+        describe: 'Webhooks URL found on the Slack custom integrations page.',
+        demand: (!nconf.get('slack:url')),
+        default: (nconf.get('slack:url') || null)
+    },
+    'save': {
+        alias: 's',
+        describe: 'Bool on whether to save argv options to config file (default: false)',
+        default: false
+    }
+    // 'config': {
+    //     alias: 'c',
+    //     describe: 'Path to config file to use. Default: $HOME/.config/slack-audio/config.json'
+    // }
+});
+
+nconf.set('slack:user', nconf.get('user'));
+nconf.set('slack:channel', nconf.get('channel'));
+nconf.set('slack:bot', nconf.get('bot'));
+if (nconf.get('url') !== null) {
+    nconf.set('slack:url', nconf.get('url'));
+}
+
+if (nconf.get('save')) {
+    nconf.save(function (err) {
+        if (err) {
+            console.error('Error saving slack-audio conf file.'.red);
+            throw err;
+        }
+
+        console.log('Saved nconf file successfully!'.green);
+
+        fs.readFile(defaultConfigFilePath, function (err, data) {
+            if (err) throw err;
+            console.log('[Current Config]'.grey);
+            console.dir(JSON.parse(data.toString()));
+        });
+    });
+}
+
 
 // Verbalize `runner`
-log.runner = 'nowplaying-slack';
+// log.runner = 'nowplaying-slack';
 
-var currentTrack = null;
-var message, payload;
+var currentTrack = null,
+    message = null,
+    payload = null;
 
-var slackPayload = {
-    'username': slack['username'],
-    'icon_emoji': slack['icon_emoji'],
-    'channel': slack['channel'],
+payload = {
+    'username': nconf.get('slack:bot'),
+    'channel': nconf.get('slack:channel'),
+    'icon_emoji': ':musical_note:',
     'text': null
 };
 
@@ -54,7 +102,7 @@ nowplaying.on("paused", onPaused);
 function getFormattedMessage(data) {
     for (var i in apps) {
         if (apps[i].name === data.source) {
-            return apps[i].getMessage(user, data);
+            return apps[i].getMessage(nconf.get('slack:user'), data);
         }
     }
     return null;
@@ -66,13 +114,13 @@ function onPlaying(data) {
     console.log("[message to post]".green);
     console.log(message.yellow);
 
-    slackPayload['text'] = message;
-    
+    payload['text'] = message;
+
     if (message && message != currentTrack) {
         request.post({
-            url: slack.webhookUrl,
+            url: nconf.get('slack:url'),
             json: true,
-            body: JSON.stringify(slackPayload)
+            body: JSON.stringify(payload)
 
         }, function(err, resp, body) {
             if (err) console.error(err);
