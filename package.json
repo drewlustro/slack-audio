@@ -1,23 +1,23 @@
 {
-  "name": "nowplaying-slack",
+  "name": "slack-audio",
   "description": "Uses nowplaying to hook into slack channel",
-  "version": "0.1.0",
-  "homepage": "https://github.com/drewlustro/nowplaying-slack",
+  "version": "0.2.0",
+  "homepage": "https://github.com/maxrelax/slack-audio",
   "author": {
     "name": "Drew Lustro",
-    "url": "https://github.com/drewlustro"
+    "url": "https://github.com/Maxrelax"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/drewlustro/nowplaying-slack.git"
+    "url": "git://github.com/maxrelax/slack-audio.git"
   },
   "bugs": {
-    "url": "https://github.com/drewlustro/nowplaying-slack/issues"
+    "url": "https://github.com/maxrelax/slack-audio/issues"
   },
   "licenses": [
     {
       "type": "MIT",
-      "url": "https://github.com/drewlustro/nowplaying-slack/blob/master/LICENSE-MIT"
+      "url": "https://github.com/maxrelax/slack-audio/blob/master/LICENSE-MIT"
     }
   ],
   "keywords": [
@@ -25,10 +25,8 @@
     "command line"
   ],
   "preferGlobal": true,
-  "bin": {
-    "nowplaying-slack": "./bin/nowplaying-slack"
-  },
-  "main": "index.js",
+  "bin": "./app.js",
+  "main": "app.js",
   "engines": {
     "node": ">=0.8"
   },
