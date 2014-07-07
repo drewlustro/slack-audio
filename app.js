@@ -9,21 +9,24 @@ var fs = require('fs'),
     nowplaying = require('nowplaying'),
     request = require('request');
 
-var itunes = require('./lib/itunes');
-var spotify = require('./lib/spotify');
-var apps = [itunes, spotify];
+var itunes = require('./lib/itunes'),
+    spotify = require('./lib/spotify'),
+    apps = [itunes, spotify],
+    defaultConfigFilePath;
 
+// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+// SETUP
+
+// Fetch default configuration path from process environment
 nconf.env(['HOME', 'NODE_ENV']);
-
-var defaultConfigFilePath = path.normalize(path.join(nconf.get('HOME'), '.config', 'slack-audio', 'config.json'));
-nconf.use('file', {
-    file: defaultConfigFilePath
-});
-
-console.log(('Using slack-audio configuration: ' + defaultConfigFilePath).yellow);
+defaultConfigFilePath = path.normalize(path.join(nconf.get('HOME'), '.config', 'slack-audio', 'config.json'));
 mkdirp.sync(path.dirname(defaultConfigFilePath));
 
+// Add conf file as 1st hierarchy for nconf
+nconf.use('file', { file: defaultConfigFilePath });
+console.log(('Using slack-audio configuration: ' + defaultConfigFilePath).yellow);
 
+// Add argv as 2nd hierarchy for nconf
 nconf.argv({
     'user': {
         alias: 'u',
@@ -51,43 +54,23 @@ nconf.argv({
         describe: 'Bool on whether to save argv options to config file (default: false)',
         default: false
     }
-    // 'config': {
-    //     alias: 'c',
-    //     describe: 'Path to config file to use. Default: $HOME/.config/slack-audio/config.json'
-    // }
 });
 
+// Allow argv to override existing prefs
 nconf.set('slack:user', nconf.get('user'));
 nconf.set('slack:channel', nconf.get('channel'));
 nconf.set('slack:bot', nconf.get('bot'));
-if (nconf.get('url') !== null) {
-    nconf.set('slack:url', nconf.get('url'));
-}
+if (nconf.get('url') !== null) nconf.set('slack:url', nconf.get('url'));
 
-if (nconf.get('save')) {
-    nconf.save(function (err) {
-        if (err) {
-            console.error('Error saving slack-audio conf file.'.red);
-            throw err;
-        }
+// Save only if -s flag passed
+if (nconf.get('save')) saveConfig();
 
-        console.log('Saved nconf file successfully!'.green);
+// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+// App
 
-        fs.readFile(defaultConfigFilePath, function (err, data) {
-            if (err) throw err;
-            console.log('[Current Config]'.grey);
-            console.dir(JSON.parse(data.toString()));
-        });
-    });
-}
-
-
-// Verbalize `runner`
-// log.runner = 'nowplaying-slack';
-
-var currentTrack = null,
-    message = null,
-    payload = null;
+var currentTrack,
+    message,
+    payload;
 
 payload = {
     'username': nconf.get('slack:bot'),
@@ -96,8 +79,13 @@ payload = {
     'text': null
 };
 
+// Listen to nowplaying events
+
 nowplaying.on("playing", onPlaying);
 nowplaying.on("paused", onPaused);
+
+
+// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 function getFormattedMessage(data) {
     for (var i in apps) {
@@ -135,3 +123,24 @@ function onPlaying(data) {
 function onPaused(data) {
     console.log("PAUSED!".yellow, data);
 }
+
+function saveConfig() {
+    nconf.save(function (err) {
+        if (err) {
+            console.error('Error saving slack-audio conf file.'.red);
+            throw err;
+        }
+
+        console.log('Saved nconf file successfully!'.green);
+
+        fs.readFile(defaultConfigFilePath, function (err, data) {
+            if (err) throw err;
+            console.log('[Current Config]'.grey);
+            console.dir(JSON.parse(data.toString()));
+        });
+    });
+}
+
+
+// Verbalize `runner`
+// log.runner = 'nowplaying-slack';
