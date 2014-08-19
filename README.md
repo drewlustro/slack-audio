@@ -3,6 +3,7 @@
 Small CLI app that employs webhooks to broadcast your current iTunes or Spotify song to a Slack channel.
 
 ### Installation for hacking
+
 ```bash
 git clone git@github.com:maxrelax/slack-audio.git
 cd slack-audio
@@ -12,9 +13,14 @@ npm install # installs node dependencies from package.json
 ```
 
 ### Usage for hacking
+
 ```
 ./app.js --user USERNAME --url WEBHOOKSURL [--channel BOTCHANNEL --bot BOTNAME]
 ```
+
+### Need a Slack WebHook URL?
+
+<a target="_blank" href="https://www.slack.com/services/new/incoming-webhook">Get a WebHooks URL here</a>
 
 - - -
 
