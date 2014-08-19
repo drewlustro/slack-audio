@@ -16,6 +16,14 @@ npm install # installs node dependencies from package.json
 ./app.js --user USERNAME --url WEBHOOKSURL [--channel BOTCHANNEL --bot BOTNAME]
 ```
 
+- - -
+
+### Installing globally
+*Note: this doesn't work yet.*
+```bash
+npm install -g slack-audio
+```
+
 ### Usage if installed globally
 ```bash
 slack-audio --user USERNAME --url WEBHOOKSURL [--channel BOTCHANNEL --bot BOTNAME]
