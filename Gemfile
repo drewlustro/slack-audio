@@ -1,4 +1,4 @@
-
+source 'https://rubygems.org'
 gem 'eventmachine'
 gem 'eventmachine-distributed-notification'
 gem 'activesupport'
