@@ -73,9 +73,7 @@ var currentTrack,
     payload;
 
 payload = {
-    'username': nconf.get('slack:bot'),
-    'channel': nconf.get('slack:channel'),
-    'icon_emoji': ':musical_note:',
+    'username': 'MusicBot',
     'text': null
 };
 
@@ -105,15 +103,14 @@ function onPlaying(data) {
     payload['text'] = message;
 
     if (message && message != currentTrack) {
-        request.post({
+	request.post({
             url: nconf.get('slack:url'),
             json: true,
-            body: JSON.stringify(payload)
-
+            body: payload
         }, function(err, resp, body) {
             if (err) console.error(err);
             if (resp && body) {
-                console.log('Slack says OK!'.green);
+            		console.log(("Slack Says: " + body).green);
                 currentTrack = message;
             }
         })

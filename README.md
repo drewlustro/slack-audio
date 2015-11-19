@@ -5,7 +5,7 @@ Small CLI app that employs webhooks to broadcast your current iTunes or Spotify 
 ### Installation for hacking
 
 ```bash
-git clone git@github.com:maxrelax/slack-audio.git
+git clone http://github.com/maxrelax/slack-audio.git
 cd slack-audio
 sudo gem install bundler # if you don't already have the bundle command
 bundle install # installs ruby dependencies from Gemfile
